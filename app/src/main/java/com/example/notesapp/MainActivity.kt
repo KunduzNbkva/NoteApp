@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notesapp.databinding.ActivityMainBinding
@@ -14,6 +13,13 @@ class MainActivity : AppCompatActivity(), NoteCLickListener, NoteDeleteCLickList
     private lateinit var viewModel: NoteViewModel
     private lateinit var noteAdapter: NoteAdapter
     private val intentToEditAdd = Intent(this, NoteAddEditActivity::class.java)
+
+    companion object{
+        const val ACTION_TYPE = "actionType"
+        const val NOTE_DESCRIPTION = "noteDescription"
+        const val NOTE_ID = "noteID"
+        const val NOTE_TITLE = "noteTitle"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,11 +45,11 @@ class MainActivity : AppCompatActivity(), NoteCLickListener, NoteDeleteCLickList
         )[NoteViewModel::class.java]
         initRecyclerView()
 
-        viewModel.allNotes.observe(this, Observer { list ->
+        viewModel.allNotes.observe(this) { list ->
             list?.let {
                 noteAdapter.updateList(it)
             }
-        })
+        }
     }
 
     private fun initRecyclerView() {
@@ -53,10 +59,10 @@ class MainActivity : AppCompatActivity(), NoteCLickListener, NoteDeleteCLickList
     }
 
     override fun noteCLick(note: Note) {
-        intentToEditAdd.putExtra("noteType", "Edit")
-        intentToEditAdd.putExtra("noteTitle", note.noteTitle)
-        intentToEditAdd.putExtra("noteDescription", note.noteDescription)
-        intentToEditAdd.putExtra("noteID", note.id)
+        intentToEditAdd.putExtra(ACTION_TYPE, R.string.edit)
+        intentToEditAdd.putExtra(NOTE_TITLE, note.noteTitle)
+        intentToEditAdd.putExtra(NOTE_DESCRIPTION, note.noteDescription)
+        intentToEditAdd.putExtra(NOTE_ID, note.id)
         startActivity(intentToEditAdd)
         this.finish()
     }

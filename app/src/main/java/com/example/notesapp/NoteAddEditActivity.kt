@@ -1,5 +1,6 @@
 package com.example.notesapp
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,7 +14,7 @@ class NoteAddEditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteAddEditBinding
     private lateinit var viewModel: NoteViewModel
     private lateinit var noteType: String
-    private var noteId = -1;
+    private var noteId = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,26 +25,29 @@ class NoteAddEditActivity : AppCompatActivity() {
         addNoteClick()
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun addNoteClick() {
         binding.addNote.setOnClickListener {
             val noteTitle = binding.addNoteTitle.text.toString()
             val noteDesc = binding.addNoteDescription.text.toString()
 
-            if (noteType.equals("Edit")) {
+            if (noteType == resources.getString(R.string.edit)) {
                 if (noteTitle.isNotEmpty() && noteDesc.isNotEmpty()) {
-                    val sdf = SimpleDateFormat("dd.MM.yyyy - HH:mm")
+                    val sdf = SimpleDateFormat(resources.getString(R.string.date_pattern))
                     val currentDate: String = sdf.format(Date())
                     val editNote = Note(noteTitle, noteDesc, currentDate)
                     editNote.id = noteId
                     viewModel.updateNote(editNote)
-                    Toast.makeText(this@NoteAddEditActivity, "Note edited", Toast.LENGTH_LONG)
+                    Toast.makeText(this@NoteAddEditActivity,
+                        resources.getText(R.string.note_edited), Toast.LENGTH_LONG)
                         .show()
                 } else {
                     if (noteTitle.isNotEmpty() && noteDesc.isNotEmpty()) {
-                        val sdf = SimpleDateFormat("dd.MM.yyyy - HH:mm")
+                        val sdf = SimpleDateFormat(resources.getString(R.string.date_pattern))
                         val currentDate: String = sdf.format(Date())
                         viewModel.addNote(Note(noteTitle, noteDesc, currentDate))
-                        Toast.makeText(this@NoteAddEditActivity, "Note added", Toast.LENGTH_LONG)
+                        Toast.makeText(this@NoteAddEditActivity,
+                            resources.getText(R.string.note_added), Toast.LENGTH_LONG)
                             .show()
                     }
                 }
@@ -54,15 +58,14 @@ class NoteAddEditActivity : AppCompatActivity() {
     }
 
     private fun getNote() {
-        noteType = intent.getStringExtra("noteType").toString()
-        if (noteType.equals("Edit")) {
-            intent.getStringExtra("noteDescription")
-            noteId = intent.getStringExtra("noteID")?.toInt() ?:-1
-            binding.addNote.text = "Update note"
-            binding.addNoteTitle.setText(intent.getStringExtra("noteTitle"))
-            binding.addNoteDescription.setText(intent.getStringExtra("noteDescription"))
+        noteType = intent.getStringExtra(MainActivity.ACTION_TYPE).toString()
+        if (noteType == resources.getText(R.string.add_note)) {
+            noteId = intent.getStringExtra(MainActivity.NOTE_ID)?.toInt() ?:-1
+            binding.addNote.text = resources.getText(R.string.update_note)
+            binding.addNoteTitle.setText(intent.getStringExtra(MainActivity.NOTE_TITLE))
+            binding.addNoteDescription.setText(intent.getStringExtra(MainActivity.NOTE_DESCRIPTION))
         } else {
-            binding.addNote.text = "Add note"
+            binding.addNote.text = resources.getText(R.string.add_note)
         }
     }
 
